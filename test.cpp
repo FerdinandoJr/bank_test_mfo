@@ -164,7 +164,7 @@ int main() {
           ? state["error"]["value"]
           : "";
 
-      if (error != expected_error) {
+      if ((error != expected_error) || (!error.empty() && expected_error.empty()) || (error.empty() && !expected_error.empty()) ) {
         cout << endl << "[ERROR]" << endl;
         cout << "Informado: " << error;
         cout << " != Esperado: " << expected_error << endl; 
