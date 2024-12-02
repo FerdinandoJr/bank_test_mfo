@@ -71,14 +71,13 @@ BankState bank_state_from_json(json state) {
 
 int main() {  
   for (int i = 0; i < 10000; i++) {
-    cout << "Trace #" << i << endl;
+    cout << endl << "--------------- Trace # ---------------" << i << endl;
     std::ifstream f("traces/out" + to_string(i) + ".itf.json");
     json data = json::parse(f);
 
     // Estado inicial: começamos do mesmo estado incial do trace
-    BankState bank_state =
-        bank_state_from_json(data["states"][0]["bank_state"]);
-
+    BankState bank_state = bank_state_from_json(data["states"][0]["bank_state"]);
+  
     auto states = data["states"];
     for (auto state : states) {
       string action = state["action_taken"];
@@ -86,9 +85,10 @@ int main() {
 
       string error = "";
 
+      cout << endl;
       // Próxima transição
       switch (stringToAction(action)) {
-        case Action::Init: {
+        case Action::Init: {          
           cout << "initializing" << endl;
           break;
         }
@@ -97,7 +97,7 @@ int main() {
           int amount = int_from_json(nondet_picks["amount"]["value"]);
 
           error = deposit(bank_state, depositor, amount);              
-          cout << "Deposito para " << depositor << " no valor de " << amount << endl;            
+          cout << "[DEPOSITO] para " << depositor << " no valor de " << amount << endl;            
           break;
         } 
         case Action::Withdraw: {
@@ -105,7 +105,7 @@ int main() {
           int amount = int_from_json(nondet_picks["amount"]["value"]);
 
           error = withdraw(bank_state, withdrawer, amount);      
-          cout << "Retirada de " << withdrawer << " no valor de " << amount << endl;        
+          cout << "[RETIRADA] de " << withdrawer << " no valor de " << amount << endl;        
           break;
         } 
         case Action::Transfer: {
@@ -114,7 +114,7 @@ int main() {
           int amount = int_from_json(nondet_picks["amount"]["value"]);
 
           error = transfer(bank_state, sender, receiver, amount);        
-          cout << "Tranferencia de " << sender << " para "<< receiver <<" no valor de " << amount << endl;
+          cout << "[TRANSFERENCIA] de " << sender << " para "<< receiver <<" no valor de " << amount << endl;
           break;
         } 
         case Action::BuyInvestment: {        
@@ -122,7 +122,7 @@ int main() {
           int amount = int_from_json(nondet_picks["amount"]["value"]);
 
           error = buy_investment(bank_state, buyer, amount);
-          cout << "Compra de inventimento feito por " << buyer << " no valor de " << amount << endl;
+          cout << "[COMPRA DE INVESTIMENTO] feito por " << buyer << " no valor de " << amount << endl;
           break;
         } 
         case Action::SellInvestment: {        
@@ -130,7 +130,7 @@ int main() {
           int investment_id = int_from_json(nondet_picks["id"]["value"]);
           
           error = sell_investment(bank_state, seller, investment_id);
-          cout << "Venda do inventimento "+ to_string(investment_id) +" feito por " << seller << endl;
+          cout << "[VENDA DE INVESTIMENTO] "+ to_string(investment_id) +" feito por " << seller << endl;
           break;
         }
         default: {
@@ -141,15 +141,35 @@ int main() {
       }
 
         BankState expected_bank_state = bank_state_from_json(state["bank_state"]);
+        auto balances = expected_bank_state.balances;
+
+        cout << "Saldo Esperado" << endl;
+        for (const auto& balance : balances) {
+            string key = balance.first;  // Chave (nome)
+            int value = balance.second;  // Valor associado
+            cout << key << ", Saldo: " << value << "\n";
+        }
+
+        auto balances_state = bank_state.balances;    
+
+        cout << endl << "Saldo Atual" << endl;
+        for (const auto& balance : balances_state) {
+          string key = balance.first;  // Chave (nome)
+          int value = balance.second;  // Valor associado
+          cout << key << ", Saldo: " << value << "\n";
+        }
+
 
         string expected_error = string(state["error"]["tag"]).compare("Some") == 0
-                                  ? state["error"]["value"]
-                                  : "";
+          ? state["error"]["value"]
+          : "";
 
-      if (!expected_error.empty()) {        
-        cout << error;
-        cout << " - " << expected_error << endl;
-      }     
+      if (error != expected_error) {
+        cout << endl << "[ERROR]" << endl;
+        cout << "Informado: " << error;
+        cout << " != Esperado:" << expected_error << endl; 
+      }
+      
     }
   }
   return 0;

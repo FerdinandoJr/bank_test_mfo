@@ -24,7 +24,7 @@ string deposit(BankState &bank_state, string depositor, int amount) {
   }
   
   if (amount <= 0) {
-    return "Quantidade precisa ser maior que zero ("+ to_string(amount) +")";
+    return "Amount should be greater than zero";
   }
 
   bank_state.balances[depositor] += amount;
@@ -37,11 +37,11 @@ string withdraw(BankState &bank_state, string withdrawer, int amount) {
     }
 
     if (amount <= 0) {
-      return "Quantidade precisa ser maior que zero ("+ to_string(amount) +")";
+      return "Amount should be greater than zero";
     }
 
     if (bank_state.balances[withdrawer] < amount) {
-      return "Saldo insuficiente para retirada de " + withdrawer;
+      return "Balance is too low";
     }
     
     bank_state.balances[withdrawer] -= amount;
@@ -58,11 +58,11 @@ string transfer(BankState &bank_state, string sender, string receiver, int amoun
   }
     
   if (amount <= 0) {
-    return "Quantidade precisa ser maior que zero ("+ to_string(amount) +")";
+    return "Amount should be greater than zero";
   }  
 
   if (bank_state.balances[sender] < amount) {
-    return "Saldo insuficiente para transferencia de " + sender + " (" + to_string(bank_state.balances[sender])+")";
+    return "Balance is too low";
   }
 
   if (sender == receiver) {
@@ -80,11 +80,11 @@ string buy_investment(BankState &bank_state, string buyer, int amount) {
     }
     
     if (bank_state.balances[buyer] < amount) {
-        return "Saldo insuficiente para compra";
+        return "Balance is too low";
     }
 
     if (amount <= 0) {
-      return "Quantidade precisa ser maior que zero ("+ to_string(amount) +")";
+      return "Amount should be greater than zero";
     }
 
     bank_state.balances[buyer] -= amount;
@@ -100,14 +100,14 @@ string sell_investment(BankState &bank_state, string seller, int investment_id) 
     }
 
     if (bank_state.investments.find(investment_id) != bank_state.investments.end()) {
-        return "Investimento com id "+ to_string(investment_id) +" nao encontrado";
+        return "No investment with this id";
     }
 
     if (bank_state.investments[investment_id].owner != seller) {
-        return "Investimento nao pertence ao vendedor";
+        return "No investment with this id";
     }
 
     bank_state.balances[seller] += bank_state.investments[investment_id].amount;
-    // bank_state.investments.erase(investment_id);
+    bank_state.investments.erase(investment_id);
     return "";
 }
