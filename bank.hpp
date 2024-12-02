@@ -99,12 +99,12 @@ string sell_investment(BankState &bank_state, string seller, int investment_id) 
       return "SELLER_NOT_FOUND";
     }
 
-    if (bank_state.investments.find(investment_id) != bank_state.investments.end()) {
+    if (bank_state.investments.find(investment_id) == bank_state.investments.end()) {
         return "No investment with this id";
     }
 
     if (bank_state.investments[investment_id].owner != seller) {
-        return "No investment with this id";
+        return "Seller can't sell an investment they don't own";
     }
 
     bank_state.balances[seller] += bank_state.investments[investment_id].amount;

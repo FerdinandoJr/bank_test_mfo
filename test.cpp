@@ -130,7 +130,7 @@ int main() {
           int investment_id = int_from_json(nondet_picks["id"]["value"]);
           
           error = sell_investment(bank_state, seller, investment_id);
-          cout << "[VENDA DE INVESTIMENTO] "+ to_string(investment_id) +" feito por " << seller << endl;
+          cout << "[VENDA DE INVESTIMENTO] feito por " << seller << "(id "+ to_string(investment_id) +")"<< endl;
           break;
         }
         default: {
@@ -167,7 +167,8 @@ int main() {
       if (error != expected_error) {
         cout << endl << "[ERROR]" << endl;
         cout << "Informado: " << error;
-        cout << " != Esperado:" << expected_error << endl; 
+        cout << " != Esperado: " << expected_error << endl; 
+        return 1;
       }
       
     }
